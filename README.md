@@ -10,7 +10,9 @@ Detailed explanation how to use this in my blog post:
 ## Run it
 
 ```
-git clone https://github.com/rafrasenberg/docker-traefik-portainer ./src
-cd src/core
+cd core
+docker network create proxy
 docker compose up -d
 ```
+
+Put your apps inside folder `apps/`
