@@ -11,7 +11,7 @@ http:
     user-auth:
       basicAuth:
         users:
-          - "raf:$apr1$MTqfVwiE$FKkzT5ERGFqwH9f3uipxA1"
+          - "admin:$apr1$xqfcytm1$5uMBJ6M7zyw5ARi3Gy5SD0" # admin:admin
 
 tls:
   options:

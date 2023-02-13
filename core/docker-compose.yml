@@ -21,10 +21,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.traefik-secure.entrypoints=websecure
-      - traefik.http.routers.traefik-secure.rule=Host(`traefik.yourdomain.com`)
-      - traefik.http.routers.traefik-secure.service=api@internal
-      - traefik.http.routers.traefik-secure.middlewares=user-auth@file
+      - traefik.http.routers.traefik.entrypoints=web
+      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.localhost}`)
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=user-auth@file
 
   portainer:
     image: "portainer/portainer-ce:latest"
@@ -41,10 +41,78 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.portainer-secure.entrypoints=websecure
-      - traefik.http.routers.portainer-secure.rule=Host(`portainer.yourdomain.com`)
-      - traefik.http.routers.portainer-secure.service=portainer
+      - traefik.http.routers.portainer.entrypoints=web
+      - traefik.http.routers.portainer.rule=Host(`${PORTAINER_DOMAIN:-portainer.localhost}`)
+      - traefik.http.routers.portainer.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
+
+  mysql:
+    image: mariadb:latest
+    container_name: mysql
+    restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    volumes:
+      - ./mysql-data/data:/var/lib/mysql
+      - ./mysql-data/init:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+    networks:
+      - proxy
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin:latest
+    restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    depends_on:
+      - mysql
+    environment:
+      - PMA_HOST=mysql
+      - UPLOAD_LIMIT=500M
+      # Autologin root
+      - PMA_USER=${MYSQL_USER:-root}
+      - PMA_PASSWORD=${MYSQL_PASSWORD:-root}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.phpmyadmin.entrypoints=web
+      - traefik.http.routers.phpmyadmin.rule=Host(`${PHPMYADMIN_DOMAIN:-pma.localhost}`)
+    networks:
+      - proxy
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    volumes:
+      - ./postgres-data/data:/var/lib/postgresql/data
+      - ./postgres-data/init:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    volumes:
+      - ./pgadmin-data:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.pgadmin.entrypoints=web
+      - traefik.http.routers.pgadmin.rule=Host(`${PGADMIN_DOMAIN:-pgadmin.localhost}`)
+    networks:
+      - proxy
 
 networks:
   proxy:

@@ -1,0 +1,9 @@
+apps/*
+!apps/README.md
+
+core/*
+!core/.env.example
+!core/docker-compose.yml
+
+.env
+.DS_Store
