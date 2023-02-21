@@ -46,19 +46,18 @@ services:
       - traefik.http.routers.portainer.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
 
-  mysql:
+  mariadb:
     image: mariadb:latest
-    container_name: mysql
+    container_name: mariadb
     restart: unless-stopped
-    security_opt:
-      - "no-new-privileges:true"
     volumes:
-      - ./mysql-data/data:/var/lib/mysql
-      - ./mysql-data/init:/docker-entrypoint-initdb.d
+      - ./mariadb-data/data:/var/lib/mysql
+      - ./mariadb-data/init:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - TZ=${MARIADB_TZ:-UTC}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-root}
     networks:
       - proxy
 
@@ -66,21 +65,22 @@ services:
     container_name: phpmyadmin
     image: phpmyadmin:latest
     restart: unless-stopped
-    security_opt:
-      - "no-new-privileges:true"
     depends_on:
-      - mysql
+      - mariadb
     environment:
-      - PMA_HOST=mysql
-      - UPLOAD_LIMIT=500M
+      - PMA_ARBITRARY=1
+      - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME:-600}
+      - MEMORY_LIMIT=${PMA_MEMORY_LIMIT:-256M}
+      - UPLOAD_LIMIT=${PMA_UPLOAD_LIMIT:-2G}
       # Autologin root
+      - PMA_HOST=mariadb
       - PMA_USER=${MYSQL_USER:-root}
       - PMA_PASSWORD=${MYSQL_PASSWORD:-root}
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.phpmyadmin.entrypoints=${ENTRYPOINT:-web}
-      - traefik.http.routers.phpmyadmin.rule=Host(${PHPMYADMIN_DOMAIN:-`pma.localhost`})
+      - traefik.http.routers.phpmyadmin.rule=Host(${PMA_DOMAIN:-`pma.localhost`})
     networks:
       - proxy
 
@@ -88,8 +88,6 @@ services:
     container_name: postgres
     image: postgres:latest
     restart: unless-stopped
-    security_opt:
-      - "no-new-privileges:true"
     volumes:
       - ./postgres-data/data:/var/lib/postgresql/data
       - ./postgres-data/init:/docker-entrypoint-initdb.d
@@ -125,7 +123,7 @@ services:
       - ./redis-data:/data
     command: --requirepass ${REDIS_PASSWORD:-redis}
     ports:
-      - "6379:6379"
+      - 6379:6379
     networks:
       - proxy
 
