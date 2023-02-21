@@ -116,6 +116,18 @@ services:
     networks:
       - proxy
 
+  redis:
+    container_name: redis
+    restart: unless-stopped
+    image: redis:latest
+    volumes:
+      - ./redis-data:/data
+    command: --requirepass ${REDIS_PASSWORD:-redis}
+    ports:
+      - "6379:6379"
+    networks:
+      - proxy
+
 networks:
   proxy:
     external: true
