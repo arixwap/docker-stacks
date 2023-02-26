@@ -4,7 +4,7 @@ services:
   traefik:
     image: "traefik:latest"
     container_name: traefik
-    restart: unless-stopped
+    restart: ${TRAEFIK_RESTART}
     security_opt:
       - "no-new-privileges:true"
     networks:
@@ -21,7 +21,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.traefik.entrypoints=${ENTRYPOINT}
+      - traefik.http.routers.traefik.entrypoints=${TRAEFIK_ENTRYPOINT}
       - traefik.http.routers.traefik.rule=Host(${TRAEFIK_DOMAIN})
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik.middlewares=user-auth@file
@@ -29,7 +29,7 @@ services:
   portainer:
     image: "portainer/portainer-ce:latest"
     container_name: portainer
-    restart: unless-stopped
+    restart: ${PORTAINER_RESTART}
     security_opt:
       - "no-new-privileges:true"
     networks:
@@ -41,7 +41,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.portainer.entrypoints=${ENTRYPOINT}
+      - traefik.http.routers.portainer.entrypoints=${PORTAINER_ENTRYPOINT}
       - traefik.http.routers.portainer.rule=Host(${PORTAINER_DOMAIN})
       - traefik.http.routers.portainer.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
@@ -49,7 +49,7 @@ services:
   mariadb:
     image: mariadb:latest
     container_name: mariadb
-    restart: unless-stopped
+    restart: ${MARIADB_RESTART}
     volumes:
       - ./mariadb-data/data:/var/lib/mysql
       - ./mariadb-data/init:/docker-entrypoint-initdb.d
@@ -64,7 +64,7 @@ services:
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin:latest
-    restart: unless-stopped
+    restart: ${PMA_RESTART}
     depends_on:
       - mariadb
     environment:
@@ -79,7 +79,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.phpmyadmin.entrypoints=${ENTRYPOINT}
+      - traefik.http.routers.phpmyadmin.entrypoints=${PMA_ENTRYPOINT}
       - traefik.http.routers.phpmyadmin.rule=Host(${PMA_DOMAIN})
     networks:
       - proxy
@@ -87,7 +87,7 @@ services:
   postgres:
     container_name: postgres
     image: postgres:latest
-    restart: unless-stopped
+    restart: ${POSTGRES_RESTART}
     volumes:
       - ./postgres-data/data:/var/lib/postgresql/data
       - ./postgres-data/init:/docker-entrypoint-initdb.d
@@ -101,7 +101,7 @@ services:
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4:latest
-    restart: unless-stopped
+    restart: ${PGADMIN_RESTART}
     volumes:
       - ./pgadmin-data:/var/lib/pgadmin
     environment:
@@ -110,14 +110,14 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.pgadmin.entrypoints=${ENTRYPOINT}
+      - traefik.http.routers.pgadmin.entrypoints=${PGADMIN_ENTRYPOINT}
       - traefik.http.routers.pgadmin.rule=Host(${PGADMIN_DOMAIN})
     networks:
       - proxy
 
   redis:
     container_name: redis
-    restart: unless-stopped
+    restart: ${REDIS_RESTART}
     image: redis:latest
     volumes:
       - ./redis-data:/data
