@@ -2,8 +2,8 @@ version: "3.8"
 
 services:
   traefik:
-    image: "traefik:${TRAEFIK_VERSION:-latest}"
     container_name: traefik
+    image: "traefik:${TRAEFIK_VERSION:-latest}"
     restart: ${TRAEFIK_RESTART:-no}
     security_opt:
       - "no-new-privileges:true"
@@ -27,8 +27,9 @@ services:
       - traefik.http.routers.traefik.middlewares=user-auth@file
 
   portainer:
-    image: "portainer/portainer-ce:${PORTAINER_VERSION:-latest}"
     container_name: portainer
+    profiles: ["all", "portainer"]
+    image: "portainer/portainer-ce:${PORTAINER_VERSION:-latest}"
     restart: ${PORTAINER_RESTART:-no}
     security_opt:
       - "no-new-privileges:true"
@@ -45,10 +46,13 @@ services:
       - traefik.http.routers.portainer.rule=Host(${PORTAINER_DOMAIN:-`portainer.localhost`})
       - traefik.http.routers.portainer.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
+    depends_on:
+      - traefik
 
   mariadb:
-    image: mariadb:${MARIADB_VERSION:-latest}
     container_name: mariadb
+    profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
+    image: mariadb:${MARIADB_VERSION:-latest}
     restart: ${MARIADB_RESTART:-no}
     volumes:
       - ./mariadb-data/data:/var/lib/mysql
@@ -63,6 +67,7 @@ services:
 
   phpmyadmin:
     container_name: phpmyadmin
+    profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
     image: phpmyadmin:${PMA_VERSION:-latest}
     restart: ${PMA_RESTART:-no}
     depends_on:
@@ -83,9 +88,13 @@ services:
       - traefik.http.routers.phpmyadmin.rule=Host(${PMA_DOMAIN:-`pma.localhost`})
     networks:
       - proxy
+    depends_on:
+      - mariadb
+      - traefik
 
   postgres:
     container_name: postgres
+    profiles: ["all", "postgres", "pgadmin"]
     image: postgres:${POSTGRES_VERSION:-latest}
     restart: ${POSTGRES_RESTART:-no}
     volumes:
@@ -100,6 +109,7 @@ services:
 
   pgadmin:
     container_name: pgadmin
+    profiles: ["all", "postgres", "pgadmin"]
     image: dpage/pgadmin4:${PGADMIN_VERSION:-latest}
     restart: ${PGADMIN_RESTART:-no}
     volumes:
@@ -114,9 +124,13 @@ services:
       - traefik.http.routers.pgadmin.rule=Host(${PGADMIN_DOMAIN:-`pgadmin.localhost`})
     networks:
       - proxy
+    depends_on:
+      - postgres
+      - traefik
 
   redis:
     container_name: redis
+    profiles: ["all", "redis"]
     restart: ${REDIS_RESTART:-no}
     image: redis:${REDIS_VERSION:-latest}
     volumes:
