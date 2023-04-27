@@ -3,21 +3,21 @@ version: "3.8"
 services:
   traefik:
     container_name: ${COMPOSE_PROJECT_NAME}-traefik
-    image: "traefik:${TRAEFIK_VERSION:-latest}"
+    image: traefik:${TRAEFIK_VERSION:-latest}
     restart: ${TRAEFIK_RESTART:-no}
     security_opt:
-      - "no-new-privileges:true"
+      - no-new-privileges:true
     networks:
       - proxy
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik-data/traefik.yml:/traefik.yml:ro"
-      - "./traefik-data/acme.json:/acme.json"
-      - "./traefik-data/configurations:/configurations"
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik-data/traefik.yml:/traefik.yml:ro
+      - ./traefik-data/acme.json:/acme.json
+      - ./traefik-data/configurations:/configurations
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
@@ -29,16 +29,16 @@ services:
   portainer:
     container_name: ${COMPOSE_PROJECT_NAME}-portainer
     profiles: ["all", "portainer"]
-    image: "portainer/portainer-ce:${PORTAINER_VERSION:-latest}"
+    image: portainer/portainer-ce:${PORTAINER_VERSION:-latest}
     restart: ${PORTAINER_RESTART:-no}
     security_opt:
-      - "no-new-privileges:true"
+      - no-new-privileges:true
     networks:
       - proxy
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./portainer-data:/data"
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
@@ -70,8 +70,6 @@ services:
     profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
     image: phpmyadmin:${PMA_VERSION:-latest}
     restart: ${PMA_RESTART:-no}
-    depends_on:
-      - mariadb
     environment:
       - PMA_ARBITRARY=1
       - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME}
