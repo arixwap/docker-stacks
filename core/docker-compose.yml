@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   traefik:
-    container_name: traefik
+    container_name: ${COMPOSE_PROJECT_NAME}-traefik
     image: "traefik:${TRAEFIK_VERSION:-latest}"
     restart: ${TRAEFIK_RESTART:-no}
     security_opt:
@@ -27,7 +27,7 @@ services:
       - traefik.http.routers.traefik.middlewares=user-auth@file
 
   portainer:
-    container_name: portainer
+    container_name: ${COMPOSE_PROJECT_NAME}-portainer
     profiles: ["all", "portainer"]
     image: "portainer/portainer-ce:${PORTAINER_VERSION:-latest}"
     restart: ${PORTAINER_RESTART:-no}
@@ -50,7 +50,7 @@ services:
       - traefik
 
   mariadb:
-    container_name: mariadb
+    container_name: ${COMPOSE_PROJECT_NAME}-mariadb
     profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
     image: mariadb:${MARIADB_VERSION:-latest}
     restart: ${MARIADB_RESTART:-no}
@@ -66,7 +66,7 @@ services:
       - proxy
 
   phpmyadmin:
-    container_name: phpmyadmin
+    container_name: ${COMPOSE_PROJECT_NAME}-phpmyadmin
     profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
     image: phpmyadmin:${PMA_VERSION:-latest}
     restart: ${PMA_RESTART:-no}
@@ -93,7 +93,7 @@ services:
       - traefik
 
   postgres:
-    container_name: postgres
+    container_name: ${COMPOSE_PROJECT_NAME}-postgres
     profiles: ["all", "postgres", "pgadmin"]
     image: postgres:${POSTGRES_VERSION:-latest}
     restart: ${POSTGRES_RESTART:-no}
@@ -108,7 +108,7 @@ services:
       - proxy
 
   pgadmin:
-    container_name: pgadmin
+    container_name: ${COMPOSE_PROJECT_NAME}-pgadmin
     profiles: ["all", "postgres", "pgadmin"]
     image: dpage/pgadmin4:${PGADMIN_VERSION:-latest}
     restart: ${PGADMIN_RESTART:-no}
@@ -129,7 +129,7 @@ services:
       - traefik
 
   redis:
-    container_name: redis
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
     profiles: ["all", "redis"]
     restart: ${REDIS_RESTART:-no}
     image: redis:${REDIS_VERSION:-latest}
