@@ -51,7 +51,7 @@ services:
 
   mariadb:
     container_name: ${COMPOSE_PROJECT_NAME}-mariadb
-    profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
+    profiles: ["all", "mariadb", "mysql", "phpmyadmin", "pma"]
     image: mariadb:${MARIADB_VERSION:-latest}
     restart: ${MARIADB_RESTART:-no}
     volumes:
@@ -67,7 +67,7 @@ services:
 
   phpmyadmin:
     container_name: ${COMPOSE_PROJECT_NAME}-phpmyadmin
-    profiles: ["all", "mariadb", "mysql", "phpmyadmin"]
+    profiles: ["all", "phpmyadmin", "pma"]
     image: phpmyadmin:${PMA_VERSION:-latest}
     restart: ${PMA_RESTART:-no}
     environment:
@@ -103,7 +103,7 @@ services:
 
   pgadmin:
     container_name: ${COMPOSE_PROJECT_NAME}-pgadmin
-    profiles: ["all", "postgres", "pgadmin"]
+    profiles: ["all", "pgadmin"]
     image: dpage/pgadmin4:${PGADMIN_VERSION:-latest}
     restart: ${PGADMIN_RESTART:-no}
     volumes:
@@ -124,7 +124,7 @@ services:
 
   mongo:
     container_name: ${COMPOSE_PROJECT_NAME}-mongo
-    profiles: ["all", "mongo", "mongodb"]
+    profiles: ["all", "mongo", "mongodb", "mongo-express"]
     image: mongo:${MONGO_VERSION:-latest}
     restart: ${MONGO_RESTART:-no}
     volumes:
@@ -141,7 +141,7 @@ services:
 
   mongo-express:
     container_name: ${COMPOSE_PROJECT_NAME}-mongo-express
-    profiles: ["all", "mongo", "mongodb"]
+    profiles: ["all", "mongo-express"]
     image: mongo-express:${MONGO_EXPRESS_VERSION:-latest}
     restart: ${MONGO_EXPRESS_RESTART:-no}
     environment:
