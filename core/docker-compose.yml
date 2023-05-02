@@ -21,10 +21,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-traefik.entrypoints=${TRAEFIK_ENTRYPOINT:-web}
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-traefik.rule=Host(${TRAEFIK_DOMAIN:-`traefik.localhost`})
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-traefik.service=api@internal
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-traefik.middlewares=user-auth@file
+      - traefik.http.routers.traefik.entrypoints=${TRAEFIK_ENTRYPOINT:-web}
+      - traefik.http.routers.traefik.rule=Host(${TRAEFIK_DOMAIN:-`traefik.localhost`})
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=user-auth@file
 
   portainer:
     container_name: ${COMPOSE_PROJECT_NAME}-portainer
@@ -42,10 +42,10 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-portainer.entrypoints=${PORTAINER_ENTRYPOINT:-web}
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-portainer.rule=Host(${PORTAINER_DOMAIN:-`portainer.localhost`})
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-portainer.service=portainer
-      - traefik.http.services.${COMPOSE_PROJECT_NAME}-portainer.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.entrypoints=${PORTAINER_ENTRYPOINT:-web}
+      - traefik.http.routers.portainer.rule=Host(${PORTAINER_DOMAIN:-`portainer.localhost`})
+      - traefik.http.routers.portainer.service=portainer
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
     depends_on:
       - traefik
 
@@ -78,8 +78,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-phpmyadmin.entrypoints=${PMA_ENTRYPOINT:-web}
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-phpmyadmin.rule=Host(${PMA_DOMAIN:-`pma.localhost`})
+      - traefik.http.routers.phpmyadmin.entrypoints=${PMA_ENTRYPOINT:-web}
+      - traefik.http.routers.phpmyadmin.rule=Host(${PMA_DOMAIN:-`pma.localhost`})
     networks:
       - proxy
     depends_on:
@@ -114,8 +114,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.entrypoints=${PGADMIN_ENTRYPOINT:-web}
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-pgadmin.rule=Host(${PGADMIN_DOMAIN:-`pgadmin.localhost`})
+      - traefik.http.routers.pgadmin.entrypoints=${PGADMIN_ENTRYPOINT:-web}
+      - traefik.http.routers.pgadmin.rule=Host(${PGADMIN_DOMAIN:-`pgadmin.localhost`})
     networks:
       - proxy
     depends_on:
@@ -151,8 +151,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-mongo-express.entrypoints=${MONGO_EXPRESS_ENTRYPOINT:-web}
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-mongo-express.rule=Host(${MONGO_EXPRESS_DOMAIN:-`mongo.localhost`})
+      - traefik.http.routers.mongo-express.entrypoints=${MONGO_EXPRESS_ENTRYPOINT:-web}
+      - traefik.http.routers.mongo-express.rule=Host(${MONGO_EXPRESS_DOMAIN:-`mongo.localhost`})
     networks:
       - proxy
     depends_on:
