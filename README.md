@@ -64,7 +64,6 @@ networks:
 ```
 
 ## TODO List
-- [ ] Mongo Express: auth login
 - [ ] Traefik: env http auth
 - [ ] Redis GUI
 
