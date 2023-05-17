@@ -1,8 +1,9 @@
 # Docker stack for local or production environment
 
 **List of available services**
+
 - **Traefik**: router for incoming traffic to the appropriate docker containers
-- **Portainer**: web UI for docker stacks, like *Docker Desktop*
+- **Portainer**: web UI for docker stacks, like _Docker Desktop_
 - **MariaDB**: alternative MySQL database
 - **phpMyAdmin**: web UI for MariaDB database
 - **Postgres**: another open source object-relational database
@@ -10,8 +11,10 @@
 - **MongoDB**: non-relational document database that provides support for JSON-like storage
 - **Mongo Express**: web UI for mongodb
 - **Redis**: cache server, in-memory, key-value data store.
+- **phpRedisAdmin**: simple web interface to manage Redis databases.
 
 ## Getting Started
+
 ```
 # Go inside core folder
 cd core
@@ -44,6 +47,7 @@ Put your application inside folder `apps/`.
 Run it using docker compose with `traefik labels`.
 
 Example `docker-compose.yml`
+
 ```
 services:
   example:
@@ -64,8 +68,8 @@ networks:
 ```
 
 ## TODO List
+
 - [ ] Traefik: env http auth
-- [ ] Redis GUI
 
 ---
 

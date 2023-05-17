@@ -172,6 +172,29 @@ services:
     networks:
       - proxy
 
+  phpredisadmin:
+    container_name: ${COMPOSE_PROJECT_NAME}-phpredisadmin
+    profiles: ["all", "phpredisadmin"]
+    restart: ${PHPREDISADMIN_RESTART:-no}
+    image: erikdubbelboer/phpredisadmin:${PHPREDISADMIN_VERSION:-latest}
+    environment:
+      - REDIS_1_HOST=redis
+      - REDIS_1_NAME=${COMPOSE_PROJECT_NAME}-redis
+      - REDIS_1_PORT=${REDIS_PORT:-6379}
+      - REDIS_1_AUTH=${REDIS_PASSWORD:-redis}
+      - ADMIN_USER=${PHPREDISADMIN_USER:-admin}
+      - ADMIN_PASS=${PHPREDISADMIN_PASS:-redis}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.phpredisadmin.entrypoints=${PHPREDISADMIN_ENTRYPOINT:-web}
+      - traefik.http.routers.phpredisadmin.rule=Host(${PHPREDISADMIN_DOMAIN:-`redis.localhost`})
+    networks:
+      - proxy
+    depends_on:
+      - redis
+      - traefik
+
 networks:
   proxy:
     external: true
