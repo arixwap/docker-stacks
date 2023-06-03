@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3"
 
 services:
   traefik:
@@ -60,7 +60,7 @@ services:
     ports:
       - ${MARIADB_PORT:-3306}:3306
     environment:
-      - TZ=${MARIADB_TZ}
+      - TZ=${TIMEZONE}
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-root}
     networks:
       - proxy
@@ -98,6 +98,7 @@ services:
       - ${POSTGRES_PORT:-5432}:5432
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - TZ=${TIMEZONE}
     networks:
       - proxy
 
@@ -136,6 +137,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-root}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-example}
+      - TZ=${TIMEZONE}
     networks:
       - proxy
 
@@ -168,6 +170,8 @@ services:
       - ./redis-data:/data
     ports:
       - ${REDIS_PORT:-6379}:6379
+    environment:
+      - TZ=${TIMEZONE}
     command: --requirepass ${REDIS_PASSWORD:-redis}
     networks:
       - proxy
