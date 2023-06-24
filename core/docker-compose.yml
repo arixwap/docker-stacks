@@ -123,6 +123,19 @@ services:
       - postgres
       - traefik
 
+  adminer:
+    container_name: ${COMPOSE_PROJECT_NAME}-adminer
+    profiles: ["all", "adminer"]
+    image: adminer:${ADMINER_VERSION:-latest}
+    restart: ${ADMINER_RESTART:-no}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.adminer.entrypoints=${ADMINER_ENTRYPOINT:-web}
+      - traefik.http.routers.adminer.rule=Host(${ADMINER_DOMAIN:-`adminer.localhost`})
+    networks:
+      - proxy
+
   mongo:
     container_name: ${COMPOSE_PROJECT_NAME}-mongo
     profiles: ["all", "mongo", "mongodb", "mongo-express"]
