@@ -8,6 +8,7 @@
 - **phpMyAdmin**: web UI for MariaDB database
 - **Postgres**: another open source object-relational database
 - **pgAdmin**: web UI for postgres
+- **Adminer**: web UI for MariaDB & Postgres database management
 - **MongoDB**: non-relational document database that provides support for JSON-like storage
 - **Mongo Express**: web UI for mongodb
 - **Redis**: cache server, in-memory, key-value data store.
