@@ -154,26 +154,6 @@ services:
     networks:
       - proxy
 
-  mongo-express:
-    container_name: ${COMPOSE_PROJECT_NAME}-mongo-express
-    profiles: ["all", "mongo-express"]
-    image: mongo-express:${MONGO_EXPRESS_VERSION:-latest}
-    restart: ${MONGO_EXPRESS_RESTART:-no}
-    environment:
-      - ME_CONFIG_BASICAUTH_USERNAME=${MONGO_EXPRESS_USERNAME:-root}
-      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGO_EXPRESS_PASSWORD:-example}
-      - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_ROOT_USERNAME:-root}:${MONGO_ROOT_PASSWORD:-example}@mongo:27017
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=proxy
-      - traefik.http.routers.mongo-express.entrypoints=${MONGO_EXPRESS_ENTRYPOINT:-web}
-      - traefik.http.routers.mongo-express.rule=Host(${MONGO_EXPRESS_DOMAIN:-`mongo.localhost`})
-    networks:
-      - proxy
-    depends_on:
-      - mongo
-      - traefik
-
   redis:
     container_name: ${COMPOSE_PROJECT_NAME}-redis
     profiles: ["all", "redis"]
