@@ -1,6 +1,16 @@
 # Dynamic configuration
 http:
   middlewares:
+    redirect-to-www:
+      redirectregex:
+        regex: ^(https?://)([^/]+)$$
+        replacement: $${1}www.$${2}
+        permanent: true
+    redirect-to-non-www:
+      redirectregex:
+        regex: ^(https?://)www.(.*)$$
+        replacement: $${1}$${2}
+        permanent: true
     secureHeaders:
       headers:
         sslRedirect: true
