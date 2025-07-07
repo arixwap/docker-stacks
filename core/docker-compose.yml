@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   traefik:
     container_name: ${COMPOSE_PROJECT_NAME}-traefik
@@ -131,6 +129,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
+      - traefik.http.services.adminer.loadbalancer.server.port=8080
       - traefik.http.routers.adminer.entrypoints=${ADMINER_ENTRYPOINT:-web}
       - traefik.http.routers.adminer.rule=Host(${ADMINER_DOMAIN:-`adminer.localhost`})
     networks:
