@@ -1,3 +1,7 @@
+accessLog:
+  addInternals: true
+  filePath: "/logs/access.log"
+
 api:
   dashboard: true
 
