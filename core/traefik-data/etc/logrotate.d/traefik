@@ -1,0 +1,12 @@
+/logs/*.log {
+    daily
+    maxage 90
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0644 root root
+    postrotate
+        kill -USR1 $(cat /var/run/traefik.pid) 2>/dev/null || true
+    endscript
+}
