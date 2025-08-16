@@ -55,6 +55,7 @@ services:
     image: mariadb:${MARIADB_VERSION}
     restart: ${MARIADB_RESTART}
     volumes:
+      - ./mariadb/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./mariadb/data:/var/lib/mysql
       - ./mariadb/init:/docker-entrypoint-initdb.d
     ports:
