@@ -1,13 +1,10 @@
-accessLog:
-  addInternals: true
-  filePath: /logs/access.log
-
 api:
   dashboard: true
 
 entryPoints:
   web:
     address: ":80"
+    # TODO: need to make this dynamic
     # http:
     #   redirections:
     #     entryPoint:

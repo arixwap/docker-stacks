@@ -1,36 +1,36 @@
 services:
   traefik:
-    container_name: ${COMPOSE_PROJECT_NAME}-traefik
-    image: traefik:${TRAEFIK_VERSION:-latest}
-    restart: ${TRAEFIK_RESTART:-no}
+    container_name: traefik
+    image: traefik:${TRAEFIK_VERSION}
+    restart: ${TRAEFIK_RESTART}
     security_opt:
       - no-new-privileges:true
     networks:
       - proxy
     ports:
-      - ${TRAEFIK_PORT:-80}:80
-      - ${TRAEFIK_SECURE_PORT:-443}:443
+      - 80:80
+      - 443:443
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik-data/traefik.yml:/traefik.yml:ro
-      - ./traefik-data/acme.json:/acme.json
-      - ./traefik-data/etc/logrotate.d/traefik:/etc/logrotate.d/traefik
-      - ./traefik-data/configurations:/configurations
-      - ./traefik-data/logs:/logs
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/acme.json:/acme.json
+      - ./traefik/configurations:/configurations
+      - ./traefik/logs:/logs
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.traefik.entrypoints=${TRAEFIK_ENTRYPOINT:-web}
-      - traefik.http.routers.traefik.rule=Host(${TRAEFIK_DOMAIN:-`traefik.localhost`})
+      - traefik.http.routers.traefik.entrypoints=${TRAEFIK_ENTRYPOINT}
+      - traefik.http.routers.traefik.rule=${TRAEFIK_HOST}
       - traefik.http.routers.traefik.service=api@internal
       - traefik.http.routers.traefik.middlewares=user-auth@file
+      # - traefik.http.routers.traefik.tls.certresolver=letsencrypt # Enable this if using https
 
   portainer:
-    container_name: ${COMPOSE_PROJECT_NAME}-portainer
+    container_name: portainer
     profiles: ["all", "portainer"]
-    image: portainer/portainer-ce:${PORTAINER_VERSION:-latest}
-    restart: ${PORTAINER_RESTART:-no}
+    image: portainer/portainer-ce:${PORTAINER_VERSION}
+    restart: ${PORTAINER_RESTART}
     security_opt:
       - no-new-privileges:true
     networks:
@@ -38,38 +38,38 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./portainer-data:/data
+      - ./portainer/data:/data
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.portainer.entrypoints=${PORTAINER_ENTRYPOINT:-web}
-      - traefik.http.routers.portainer.rule=Host(${PORTAINER_DOMAIN:-`portainer.localhost`})
+      - traefik.http.routers.portainer.entrypoints=${PORTAINER_ENTRYPOINT}
+      - traefik.http.routers.portainer.rule=${PORTAINER_HOST}
       - traefik.http.routers.portainer.service=portainer
       - traefik.http.services.portainer.loadbalancer.server.port=9000
     depends_on:
       - traefik
 
   mariadb:
-    container_name: ${COMPOSE_PROJECT_NAME}-mariadb
+    container_name: mariadb
     profiles: ["all", "mariadb", "mysql", "phpmyadmin", "pma"]
-    image: mariadb:${MARIADB_VERSION:-latest}
-    restart: ${MARIADB_RESTART:-no}
+    image: mariadb:${MARIADB_VERSION}
+    restart: ${MARIADB_RESTART}
     volumes:
-      - ./mariadb-data/data:/var/lib/mysql
-      - ./mariadb-data/init:/docker-entrypoint-initdb.d
+      - ./mariadb/data:/var/lib/mysql
+      - ./mariadb/init:/docker-entrypoint-initdb.d
     ports:
-      - ${MARIADB_PORT:-3306}:3306
+      - ${MARIADB_PORT}:3306
     environment:
       - TZ=${TIMEZONE}
-      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-root}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     networks:
       - proxy
 
   phpmyadmin:
-    container_name: ${COMPOSE_PROJECT_NAME}-phpmyadmin
+    container_name: phpmyadmin
     profiles: ["all", "phpmyadmin", "pma"]
-    image: phpmyadmin:${PMA_VERSION:-latest}
-    restart: ${PMA_RESTART:-no}
+    image: phpmyadmin:${PMA_VERSION}
+    restart: ${PMA_RESTART}
     environment:
       - PMA_ARBITRARY=1
       - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME}
@@ -78,8 +78,8 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.phpmyadmin.entrypoints=${PMA_ENTRYPOINT:-web}
-      - traefik.http.routers.phpmyadmin.rule=Host(${PMA_DOMAIN:-`pma.localhost`})
+      - traefik.http.routers.phpmyadmin.entrypoints=${PMA_ENTRYPOINT}
+      - traefik.http.routers.phpmyadmin.rule=${PMA_HOST}
     networks:
       - proxy
     depends_on:
@@ -87,36 +87,36 @@ services:
       - traefik
 
   postgres:
-    container_name: ${COMPOSE_PROJECT_NAME}-postgres
+    container_name: postgres
     profiles: ["all", "postgres", "pgadmin"]
-    image: postgres:${POSTGRES_VERSION:-latest}
-    restart: ${POSTGRES_RESTART:-no}
+    image: postgres:${POSTGRES_VERSION}
+    restart: ${POSTGRES_RESTART}
     volumes:
-      - ./postgres-data/data:/var/lib/postgresql/data
-      - ./postgres-data/init:/docker-entrypoint-initdb.d
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
     ports:
-      - ${POSTGRES_PORT:-5432}:5432
+      - ${POSTGRES_PORT}:5432
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=${TIMEZONE}
     networks:
       - proxy
 
   pgadmin:
-    container_name: ${COMPOSE_PROJECT_NAME}-pgadmin
+    container_name: pgadmin
     profiles: ["all", "pgadmin"]
-    image: dpage/pgadmin4:${PGADMIN_VERSION:-latest}
-    restart: ${PGADMIN_RESTART:-no}
+    image: dpage/pgadmin4:${PGADMIN_VERSION}
+    restart: ${PGADMIN_RESTART}
     volumes:
-      - ./pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/data:/var/lib/pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-admin}
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.pgadmin.entrypoints=${PGADMIN_ENTRYPOINT:-web}
-      - traefik.http.routers.pgadmin.rule=Host(${PGADMIN_DOMAIN:-`pgadmin.localhost`})
+      - traefik.http.routers.pgadmin.entrypoints=${PGADMIN_ENTRYPOINT}
+      - traefik.http.routers.pgadmin.rule=${PGADMIN_HOST}
     networks:
       - proxy
     depends_on:
@@ -124,69 +124,69 @@ services:
       - traefik
 
   adminer:
-    container_name: ${COMPOSE_PROJECT_NAME}-adminer
+    container_name: adminer
     profiles: ["all", "adminer"]
-    image: adminer:${ADMINER_VERSION:-latest}
-    restart: ${ADMINER_RESTART:-no}
+    image: adminer:${ADMINER_VERSION}
+    restart: ${ADMINER_RESTART}
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.services.adminer.loadbalancer.server.port=8080
-      - traefik.http.routers.adminer.entrypoints=${ADMINER_ENTRYPOINT:-web}
-      - traefik.http.routers.adminer.rule=Host(${ADMINER_DOMAIN:-`adminer.localhost`})
+      - traefik.http.routers.adminer.entrypoints=${ADMINER_ENTRYPOINT}
+      - traefik.http.routers.adminer.rule=${ADMINER_HOST}
     networks:
       - proxy
 
   mongo:
-    container_name: ${COMPOSE_PROJECT_NAME}-mongo
+    container_name: mongo
     profiles: ["all", "mongo", "mongodb", "mongo-express"]
-    image: mongo:${MONGO_VERSION:-latest}
-    restart: ${MONGO_RESTART:-no}
+    image: mongo:${MONGO_VERSION}
+    restart: ${MONGO_RESTART}
     volumes:
-      - ./mongo-data/data:/data/db
-      - ./mongo-data/configdb:/data/configdb
-      - ./mongo-data/init:/docker-entrypoint-initdb.d
+      - ./mongo/db:/data/db
+      - ./mongo/configdb:/data/configdb
+      - ./mongo/init:/docker-entrypoint-initdb.d
     ports:
-      - ${MONGO_PORT:-27017}:27017
+      - ${MONGO_PORT}:27017
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME:-root}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD:-example}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
       - TZ=${TIMEZONE}
     networks:
       - proxy
 
   redis:
-    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    container_name: redis
     profiles: ["all", "redis"]
-    restart: ${REDIS_RESTART:-no}
-    image: redis:${REDIS_VERSION:-latest}
+    restart: ${REDIS_RESTART}
+    image: redis:${REDIS_VERSION}
     volumes:
-      - ./redis-data:/data
+      - ./redis/data:/data
     ports:
-      - ${REDIS_PORT:-6379}:6379
+      - ${REDIS_PORT}:6379
     environment:
       - TZ=${TIMEZONE}
-    command: --requirepass ${REDIS_PASSWORD:-redis}
+    command: --requirepass ${REDIS_PASSWORD}
     networks:
       - proxy
 
   phpredisadmin:
-    container_name: ${COMPOSE_PROJECT_NAME}-phpredisadmin
+    container_name: phpredisadmin
     profiles: ["all", "phpredisadmin"]
-    restart: ${PHPREDISADMIN_RESTART:-no}
-    image: erikdubbelboer/phpredisadmin:${PHPREDISADMIN_VERSION:-latest}
+    restart: ${PHPREDISADMIN_RESTART}
+    image: erikdubbelboer/phpredisadmin:${PHPREDISADMIN_VERSION}
     environment:
       - REDIS_1_HOST=redis
       - REDIS_1_NAME=${COMPOSE_PROJECT_NAME}-redis
-      - REDIS_1_PORT=${REDIS_PORT:-6379}
-      - REDIS_1_AUTH=${REDIS_PASSWORD:-redis}
-      - ADMIN_USER=${PHPREDISADMIN_USER:-admin}
-      - ADMIN_PASS=${PHPREDISADMIN_PASS:-redis}
+      - REDIS_1_PORT=${REDIS_PORT}
+      - REDIS_1_AUTH=${REDIS_PASSWORD}
+      - ADMIN_USER=${PHPREDISADMIN_USER}
+      - ADMIN_PASS=${PHPREDISADMIN_PASS}
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.phpredisadmin.entrypoints=${PHPREDISADMIN_ENTRYPOINT:-web}
-      - traefik.http.routers.phpredisadmin.rule=Host(${PHPREDISADMIN_DOMAIN:-`redis.localhost`})
+      - traefik.http.routers.phpredisadmin.entrypoints=${PHPREDISADMIN_ENTRYPOINT}
+      - traefik.http.routers.phpredisadmin.rule=${PHPREDISADMIN_HOST}
     networks:
       - proxy
     depends_on:

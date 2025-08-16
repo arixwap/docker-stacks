@@ -21,6 +21,7 @@ http:
     user-auth:
       basicAuth:
         users:
+          # Generate in https://www.web2generators.com/apache-tools/htpasswd-generator
           - "admin:$apr1$xqfcytm1$5uMBJ6M7zyw5ARi3Gy5SD0" # admin:admin
 
 tls:
